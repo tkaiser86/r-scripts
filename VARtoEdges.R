@@ -54,7 +54,7 @@ VARtoEdges <- function(x, nonsig = F, alpha = .05, bonferroni = T, granger = F){
     for(i in 1:x$K){
       granger[i] <- vars::causality(x, cause = varnames[i])$Granger$p.value
     }
-    granger.causality <- matrix(rep(granger, ols.var$K), ncol = 5) < .05
+    granger.causality <- matrix(rep(granger, x$K), ncol = 5) < .05
     contemp.edges <- contemp.edges * granger.causality
   }
   edgelist$contemp <- contemp.edges
