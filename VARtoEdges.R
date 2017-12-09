@@ -33,7 +33,7 @@ VARtoEdges <- function(x, nonsig = F, alpha = .05, bonferroni = T){
   resmatrix <- matrix(nrow = x$K, ncol = x$K)
   for(i in 1:x$K){
     for(j in 1:x$K){
-  resmatrix[j,i] <- mean(temporal.edges[seq((1+j), (x$K*x$p), x$K),i])
+  resmatrix[j,i] <- mean(temporal.edges[seq(j, (x$K*x$p), x$K), i])
     }}
   df.edges <- as.data.frame(
     resmatrix)
