@@ -21,7 +21,7 @@ convert.effect <- function(x, from, to, a = 4){
     return(res)
   }
   if(from == "r" & to == "besd"){
-    res = .50 + x/2
+    res = .50 + abs(x)/2
     return(res)
   }
   if(from == "d" & to == "besd"){
