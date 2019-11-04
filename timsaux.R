@@ -4,6 +4,8 @@
 # - Mean absolute difference (mad), an alternative to standard deviation
 # - Distance correlation for a matrix
 # - Probability of obtaining two statistically different test scores, classical test theory version (PDTSctt)
+#
+# source("https://raw.githubusercontent.com/tkasci/r-scripts/master/timsaux.R")
 
 omega_sq <- function(aov_in, neg2zero=T){
   aovtab <- summary(aov_in)[[1]]
