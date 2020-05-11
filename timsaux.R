@@ -7,6 +7,40 @@
 #
 # source("https://raw.githubusercontent.com/tkasci/r-scripts/master/timsaux.R")
 
+convert.effect <- function(x, from, to, a = 4){
+  if(from == "logodds" & to == "d"){
+    res <- x * sqrt(3)/pi
+    return(res)
+  }
+  if(from == "d" & to == "logodds"){
+    res <- x * pi/sqrt(3)
+    return(res)
+  }
+  if(from == "r" & to == "d"){
+    res <- 2*x / sqrt(1-x^2)
+    return(res)
+  }
+  if(from == "d" & to == "r"){
+    res <- x / sqrt(x^2+a)
+    return(res)
+  }
+  if(from == "r" & to == "besd"){
+    res = .50 + x/2
+    return(res)
+  }
+  if(from == "d" & to == "besd"){
+    y <- x / sqrt(x^2+a)
+    res <- .50 + y/2
+    return(res)
+  }
+  if(from == "logodds" & to == "besd"){
+    y <- x * sqrt(3)/pi  # logodds to d
+    y <- y / sqrt(y^2+a) # d to r
+    res <- .50 - y/2
+    return(res)
+  }
+}
+
 omega_sq <- function(aov_in, neg2zero=T){
   aovtab <- summary(aov_in)[[1]]
   n_terms <- length(aovtab[["Sum Sq"]]) - 1
@@ -25,8 +59,8 @@ omega_sq <- function(aov_in, neg2zero=T){
   return(output)
 }
 
-# Mean absolute deviation, an alternative to the standard deviation
-mad <- function(x){
+# Average absolute deviation, an alternative to the standard deviation
+aad <- function(x){
   sum(abs(x-mean(x))) / length(x)
 }
 
@@ -89,4 +123,26 @@ pdts_ctt <- function(x, rel = NULL, alpha=.975){
   diff.scores <- abs(score.combinations[1,] - score.combinations[2,])
   diff.tab <- table(diff.scores > LSD) 
   diff.tab[2] / sum(diff.tab)
+}
+
+maximize.pdts <-  function(x, length, trials = 1000, verbose=F, reliability = NULL){
+  pdts.selections <- as.data.frame(matrix(nrow=trials, ncol=(length+3)))
+  
+  if(length > ncol(x)){stop("Length of subscale is larger than the scale itself!")}
+  indices <- 1:ncol(x)
+  for(i in 1:trials){
+    if(verbose){message(i)}
+    subselection <- sample(indices, length, replace = F)
+    pdts.selections[i,1:length] <- subselection
+    subset.data <- x[,subselection]
+    
+    alpha.val <- psych::alpha(subset.data)$total$raw_alpha
+    omega.val <- psych::omega(subset.data, plot=F)$omega_h
+    if(is.null(reliability)){rel <- omega.val} else {rel <- reliability}
+    pdts.selections[i,(length+1)] <- pdts_ctt(rowMeans(subset.data), rel = rel)
+    pdts.selections[i,(length+2)] <- alpha.val
+    pdts.selections[i,(length+3)] <- omega.val}
+  
+  
+  return(pdts.selections)
 }
